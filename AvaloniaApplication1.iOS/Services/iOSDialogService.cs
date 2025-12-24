@@ -130,7 +130,9 @@ public class iOSDialogService : IDialogService
 
         public RelayCommand(Action execute) => _execute = execute;
 
+#pragma warning disable CS0067 // Event is never used
         public event EventHandler? CanExecuteChanged;
+#pragma warning restore CS0067
         public bool CanExecute(object? parameter) => true;
         public void Execute(object? parameter) => _execute();
     }

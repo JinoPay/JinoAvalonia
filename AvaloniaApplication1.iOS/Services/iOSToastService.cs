@@ -8,13 +8,11 @@ public class iOSToastService : IToastService
 {
     public Task ShowAsync(string title, string message, ToastType type = ToastType.Information, int durationMs = 3000)
     {
-        var fullMessage = string.IsNullOrEmpty(title) ? message : $"{title}: {message}";
-
         UIApplication.SharedApplication.InvokeOnMainThread(() =>
         {
             var alert = UIAlertController.Create(title, message, UIAlertControllerStyle.Alert);
 
-            var rootViewController = UIApplication.SharedApplication.KeyWindow?.RootViewController;
+            var rootViewController = GetRootViewController();
             rootViewController?.PresentViewController(alert, true, null);
 
             Task.Delay(durationMs).ContinueWith(_ =>
@@ -27,5 +25,25 @@ public class iOSToastService : IToastService
         });
 
         return Task.CompletedTask;
+    }
+
+    private static UIViewController? GetRootViewController()
+    {
+        // Use modern scene-based API for iOS 13+
+        var scenes = UIApplication.SharedApplication.ConnectedScenes;
+        foreach (var scene in scenes)
+        {
+            if (scene is UIWindowScene windowScene)
+            {
+                foreach (var window in windowScene.Windows)
+                {
+                    if (window.IsKeyWindow)
+                    {
+                        return window.RootViewController;
+                    }
+                }
+            }
+        }
+        return null;
     }
 }
