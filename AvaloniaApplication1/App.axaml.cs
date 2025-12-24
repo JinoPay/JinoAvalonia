@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Avalonia;
@@ -145,6 +146,8 @@ public partial class App : Application
         ServiceLocator.Initialize(serviceProvider);
     }
 
+    [UnconditionalSuppressMessage("Trimming", "IL2026:RequiresUnreferencedCode",
+        Justification = "DataValidators is used at runtime and preserved by Avalonia")]
     private void DisableAvaloniaDataAnnotationValidation()
     {
         // Get an array of plugins to remove

@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using AvaloniaApplication1.Models;
 
 namespace AvaloniaApplication1.Services;
@@ -33,7 +34,7 @@ public class PreferencesService
                 Token = user.Token
             };
 
-            var json = JsonSerializer.Serialize(data);
+            var json = JsonSerializer.Serialize(data, PreferencesJsonContext.Default.AutoLoginData);
             File.WriteAllText(_preferencesPath, json);
         }
         catch (Exception ex)
@@ -52,7 +53,7 @@ public class PreferencesService
             }
 
             var json = File.ReadAllText(_preferencesPath);
-            var data = JsonSerializer.Deserialize<AutoLoginData>(json);
+            var data = JsonSerializer.Deserialize(json, PreferencesJsonContext.Default.AutoLoginData);
 
             if (data != null && !string.IsNullOrEmpty(data.Username))
             {
@@ -85,10 +86,15 @@ public class PreferencesService
             Console.WriteLine($"Failed to clear preferences: {ex.Message}");
         }
     }
+}
 
-    private class AutoLoginData
-    {
-        public string Username { get; set; } = string.Empty;
-        public string? Token { get; set; }
-    }
+public class AutoLoginData
+{
+    public string Username { get; set; } = string.Empty;
+    public string? Token { get; set; }
+}
+
+[JsonSerializable(typeof(AutoLoginData))]
+internal partial class PreferencesJsonContext : JsonSerializerContext
+{
 }
